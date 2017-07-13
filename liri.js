@@ -1,16 +1,36 @@
 
 var keys = require("./keys.js");
 var Spotify = require('node-spotify-api');
+var Twitter = require('twitter');
+var request = require('request');
 
 var command = process.argv[2];
 
-
+//This will show your last 20 tweets and when they were created at in your terminal/bash window.
 if(command === "my-tweets"){
-	console.log("display tweets");
-	//This will show your last 20 tweets and when they were created at in your terminal/bash window.
+	var client = new Twitter({
+	  consumer_key: keys.twitterKeys.consumer_key,
+	  consumer_secret: keys.twitterKeys.consumer_secret,
+	  access_token_key: keys.twitterKeys.access_token_key,
+	  access_token_secret: keys.twitterKeys.access_token_secret,
+	});
+	 
+	var params = {screen_name: 'tony_storti'};
+	client.get('statuses/user_timeline', params, function(error, tweets, response) {
+		if (!error) {
+	    	console.log("---------tony_storti tweets--------");
+	    	for (var i=0;i<tweets.length;i++){
+	    		console.log("--------tweet #"+(i+1)+"---------");
+	    		console.log("Message: "+ tweets[i].text);
+				console.log("Created at: "+ tweets[i].created_at);
+	    	}
+	  	}
+	});	
 }
+
+//this will show information related to the first song returned by spotify query for user-entered song title
 if(command === "spotify-this-song"){
-	console.log("spotifying song");
+	var songTitle = process.argv[3];
  
 	var spotify = new Spotify({
 	  id: keys.spotifyKeys.client_ID,
@@ -18,7 +38,7 @@ if(command === "spotify-this-song"){
 	});
 	 
 	spotify
-	  .search({ type: 'track', query: 'All the Small Things' })
+	  .search({ type: 'track', query: songTitle })
 	  .then(function(response) {
 	    //artist name
 	    console.log(response.tracks.items[0].artists[0].name);
@@ -35,23 +55,34 @@ if(command === "spotify-this-song"){
 	  });
 
 	/*
-	`node liri.js spotify-this-song '<song name here>'`
-	
-	* This will show the following information about the song in your terminal/bash window
-     
-     * Artist(s)
-     
-     * The song's name
-     
-     * A preview link of the song from Spotify
-     
-     * The album that the song is from
 
    * If no song is provided then your program will default to "The Sign" by Ace of Base.
 	*/
 }
 if(command === "movie-this"){
-	console.log("getting movie info");
+	
+	var movieTitle = process.argv[3];
+	var omdbURL = "http://www.omdbapi.com/?apikey="+keys.omdbKeys.api_key+"&t="+movieTitle;
+
+	request(omdbURL, function (error, response, body) {
+		 
+  		if(error ===null){
+  			console.log(body);
+  			console.log("--------------------");
+  			//console.log(body.Title);
+  			//console.log(body.Year);
+  			//console.log(body.imdbRating);
+  			//console.log(body.Ratings);
+  			//console.log(body.Country);
+  			//console.log(body.Language);
+  			//console.log(body.Plot);
+  			//console.log(body.Actors);
+  		}
+		else{
+			console.log('statusCode:', response && response.statusCode);
+			console.log("error:", error);
+		}
+	});
 	/*
 	`node liri.js movie-this '<movie name here>'`
 
