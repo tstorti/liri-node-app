@@ -3,6 +3,7 @@ var keys = require("./keys.js");
 var Spotify = require('node-spotify-api');
 var Twitter = require('twitter');
 var request = require('request');
+var file = require('file-system');
 
 var command = process.argv[2];
 
@@ -85,17 +86,41 @@ if(command === "movie-this"){
 	});
 }
 if(command === "do-what-it-says"){
-	console.log("doing what it says");
 
-	/*
-	`node liri.js do-what-it-says`
-   
-   * Using the `fs` Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
-     
-     * It should run `spotify-this-song` for "I Want it That Way," as follows the text in `random.txt`.
-     
-     * Feel free to change the text in that document to test out the feature for other commands.
-     */
+	var content;
+	
+	file.readFile('./random.txt', 'utf8', function read(err, data) {
+	    if (err) {
+	        throw err;
+	    }
+	    content = data;
+
+	    console.log(content);
+	    command = content.split(",")[0];
+	    songTitle = content.split(",")[1];
+
+	    var spotify = new Spotify({
+			id: keys.spotifyKeys.client_ID,
+			secret: keys.spotifyKeys.client_secret,
+		});
+
+	    spotify
+			.search({ type: 'track', query: songTitle })
+			.then(function(response) {
+		    //artist name
+		    console.log(response.tracks.items[0].artists[0].name);
+		    //track name
+		    console.log(response.tracks.items[0].name);
+		    //preview link
+		    console.log(response.tracks.items[0].external_urls.spotify);
+		    //album
+		    console.log(response.tracks.items[0].album.name);
+
+		})
+		.catch(function(err) {
+			console.log(error);
+		});
+	});
 }
 
 
