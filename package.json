@@ -1,0 +1,27 @@
+{
+  "name": "liri-node-app",
+  "version": "1.0.0",
+  "description": "node app for using spotify, twitter, and omdb apis",
+  "main": "liri.js",
+  "scripts": {
+    "test": "n/a"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tstorti/liri-node-app.git"
+  },
+  "keywords": [
+    "spotify",
+    "twitter",
+    "omdb"
+  ],
+  "author": "Tony Storti",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tstorti/liri-node-app/issues"
+  },
+  "homepage": "https://github.com/tstorti/liri-node-app#readme",
+  "dependencies": {
+    "node-spotify-api": "^1.0.5"
+  }
+}
