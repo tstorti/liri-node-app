@@ -31,7 +31,11 @@ if(command === "my-tweets"){
 //this will show information related to the first song returned by spotify query for user-entered song title
 if(command === "spotify-this-song"){
 	var songTitle = process.argv[3];
- 
+ 	
+ 	if (songTitle === undefined){
+ 		songTitle = "Ace of Base The Sign";
+ 	}
+
 	var spotify = new Spotify({
 	  id: keys.spotifyKeys.client_ID,
 	  secret: keys.spotifyKeys.client_secret,
@@ -53,11 +57,6 @@ if(command === "spotify-this-song"){
 	  .catch(function(err) {
 	    console.log(error);
 	  });
-
-	/*
-
-   * If no song is provided then your program will default to "The Sign" by Ace of Base.
-	*/
 }
 if(command === "movie-this"){
 	
@@ -67,38 +66,23 @@ if(command === "movie-this"){
 	request(omdbURL, function (error, response, body) {
 		 
   		if(error ===null){
-  			console.log(body);
+  			var data = JSON.parse(body);
+  			
   			console.log("--------------------");
-  			//console.log(body.Title);
-  			//console.log(body.Year);
-  			//console.log(body.imdbRating);
-  			//console.log(body.Ratings);
-  			//console.log(body.Country);
-  			//console.log(body.Language);
-  			//console.log(body.Plot);
-  			//console.log(body.Actors);
+  			console.log("Title: " + data.Title);
+  			console.log("Released in: "+ data.Year);
+  			console.log("IMDB Rating: "+ data.imdbRating);
+  			console.log("Rotten Tomatoes Rating: "+ data.Ratings[1].Value);
+  			console.log("Produced in: "+ data.Country);
+  			console.log("Language(s): "+ data.Language);
+  			console.log("Plot: "+ data.Plot);
+  			console.log("Actors: "+ data.Actors);
   		}
 		else{
 			console.log('statusCode:', response && response.statusCode);
 			console.log("error:", error);
 		}
 	});
-	/*
-	`node liri.js movie-this '<movie name here>'`
-
-   * This will output the following information to your terminal/bash window:
-
-     ```
-       * Title of the movie.
-       * Year the movie came out.
-       * IMDB Rating of the movie.
-       * Rotten Tomatoes Rating of the movie.
-       * Country where the movie was produced.
-       * Language of the movie.
-       * Plot of the movie.
-       * Actors in the movie.
-     ```
-     */
 }
 if(command === "do-what-it-says"){
 	console.log("doing what it says");
