@@ -11,8 +11,8 @@ var command = process.argv[2];
 //This will show the last 20 tweets of specified user and when they were created at in your terminal/bash window.
 if(command === "my-tweets"){
 	var screenName = "TheOnion";
-	logInfo(command+",");
- 	logInfo(screenName+",");
+	logInfo(command+"\n");
+ 	logInfo(screenName+"\n");
 	getTweets(screenName);
 }
 
@@ -29,8 +29,8 @@ if(command === "spotify-this-song"){
  		songTitle = "Ace of Base The Sign";
  	}
  	//get the spotify information and output it to the terminal
- 	logInfo(command+",");
- 	logInfo(songTitle+",");
+ 	logInfo(command+"\n");
+ 	logInfo(songTitle+"\n");
  	spotifySong(songTitle);	
 }
 
@@ -43,8 +43,8 @@ if(command === "movie-this"){
 	}
 	movieTitle=movieTitle.trim();
 	//get the movie information and output it to the terminal
-	logInfo(command+",");
- 	logInfo(movieTitle+",");
+	logInfo(command+"\n");
+ 	logInfo(movieTitle+"\n");
 	movieThis(movieTitle);
 }
 
@@ -71,8 +71,7 @@ function getTweets(username){
 	    		console.log("Message: "+ tweets[i].text);
 				console.log("Created at: "+ tweets[i].created_at);
 				//output same info to log.txt
-				logInfo(tweets[i].text+",");
-				logInfo(tweets[i].created_at+",");
+				logInfo(tweets[i].text+" "+tweets[i].created_at+ "\n");
 	    	}
 	  	}
 	});	
@@ -103,16 +102,16 @@ function movieThis(title){
   			console.log("Actors: "+ data.Actors);
   			
   			//output same info to log.txt
-  			logInfo(data.Title+",");
-			logInfo(data.Year+",");
-			logInfo(data.imdbRating+",");
+  			logInfo(data.Title+"\n");
+			logInfo(data.Year+"\n");
+			logInfo(data.imdbRating+"\n");
 			if(data.Ratings !== undefined){
-  				logInfo(data.Ratings[1].Value+",");
+  				logInfo(data.Ratings[1].Value+"\n");
   			}
-			logInfo(data.Country+",");
-			logInfo(data.Language+",");
-			logInfo(data.Plot+",");
-			logInfo(data.Actors+",");
+			logInfo(data.Country+"\n");
+			logInfo(data.Language+"\n");
+			logInfo(data.Plot+"\n");
+			logInfo(data.Actors+"\n");
 		}
 
 		else{
@@ -143,10 +142,10 @@ function spotifySong(title){
 			//album
 			console.log(response.tracks.items[0].album.name);
 			//output same info to log.txt
-			logInfo(response.tracks.items[0].artists[0].name+",");
-			logInfo(response.tracks.items[0].name+",");
-			logInfo(response.tracks.items[0].external_urls.spotify+",");
-			logInfo(response.tracks.items[0].album.name+",");
+			logInfo(response.tracks.items[0].artists[0].name+"\n");
+			logInfo(response.tracks.items[0].name+"\n");
+			logInfo(response.tracks.items[0].external_urls.spotify+"\n");
+			logInfo(response.tracks.items[0].album.name+"\n");
 		})
 		.catch(function(err) {
 			console.log(error);
@@ -164,8 +163,11 @@ function doWhatItSays(){
 	    content = data;
 	    //console.log(content);
 	    newCommand = content.split(",")[0];
+	    
 	    value = content.split(",")[1];
 	    
+	    logInfo("do-what-it-says "+ newCommand+"\n");
+ 		logInfo(value+"\n");
 	    //allow for changes to the random file with a different command
 	    if (newCommand ==="spotify-this-song"){
 	    	spotifySong(value);
