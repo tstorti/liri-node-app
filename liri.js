@@ -1,4 +1,5 @@
 
+//require node modules and keys file
 var keys = require("./keys.js");
 var Spotify = require('node-spotify-api');
 var Twitter = require('twitter');
@@ -7,9 +8,11 @@ var file = require('file-system');
 
 var command = process.argv[2];
 
-//This will show your last 20 tweets and when they were created at in your terminal/bash window.
+//This will show the last 20 tweets of specified user and when they were created at in your terminal/bash window.
 if(command === "my-tweets"){
-	var screenName = "tony_storti";
+	var screenName = "TheOnion";
+	logInfo(command+",");
+ 	logInfo(screenName+",");
 	getTweets(screenName);
 }
 
@@ -20,50 +23,38 @@ if(command === "spotify-this-song"){
 		// Build a string with the song title.
 		songTitle = songTitle + " " + process.argv[i];
 	}
- 	
+	songTitle=songTitle.trim();
+ 	//default song title if user does not include a song name with the command
  	if (songTitle === ""){
  		songTitle = "Ace of Base The Sign";
  	}
+ 	//get the spotify information and output it to the terminal
+ 	logInfo(command+",");
+ 	logInfo(songTitle+",");
  	spotifySong(songTitle);	
 }
 
+//run the movie-this function if user enters that command
 if(command === "movie-this"){
-	
 	var movieTitle="";
-
 	for (var i = 3; i < process.argv.length; i++) {
 		// Build a string with the song title.
 		movieTitle = movieTitle + " " + process.argv[i];
 	}
+	movieTitle=movieTitle.trim();
+	//get the movie information and output it to the terminal
+	logInfo(command+",");
+ 	logInfo(movieTitle+",");
 	movieThis(movieTitle);
 }
 
+//read the random.txt file and run the appropriate function
 if(command === "do-what-it-says"){
-
-	var content;
-	file.readFile('./random.txt', 'utf8', function read(err, data) {
-	    if (err) {
-	        throw err;
-	    }
-	    content = data;
-	    //console.log(content);
-	    newCommand = content.split(",")[0];
-	    value = content.split(",")[1];
-	    
-	    if (newCommand ==="spotify-this-song"){
-	    	spotifySong(value);
-	    }
-	    else if (newCommand ==="movie-this"){
-	    	movieThis(value);
-	    }
-	    else if(newCommand ==="my-tweets"){
-	    	getTweets(value);
-	    }
-	});
+		doWhatItSays();
 }
 
+//this function read the twitter api keys and gets the requested information before outputting to the terminal
 function getTweets(username){
-
 	var client = new Twitter({
 		consumer_key: keys.twitterKeys.consumer_key,
 		consumer_secret: keys.twitterKeys.consumer_secret,
@@ -79,14 +70,63 @@ function getTweets(username){
 	    		console.log("--------tweet #"+(i+1)+"---------");
 	    		console.log("Message: "+ tweets[i].text);
 				console.log("Created at: "+ tweets[i].created_at);
+				//output same info to log.txt
+				logInfo(tweets[i].text+",");
+				logInfo(tweets[i].created_at+",");
 	    	}
 	  	}
 	});	
 };
 
+//this function uses the omdb api to retrieve information on the requested title.
+function movieThis(title){
+	
+	var omdbURL = "http://www.omdbapi.com/?apikey="+keys.omdbKeys.api_key+"&t="+title;
+
+	request(omdbURL, function (error, response, body) {
+		 
+  		if(error ===null){
+  			//convert data into a JSON object
+  			var data = JSON.parse(body);
+  			
+  			console.log("--------------------");
+  			console.log("Title: " + data.Title);
+  			console.log("Released in: "+ data.Year);
+  			console.log("IMDB Rating: "+ data.imdbRating);
+  			//if movie has a Rotten Tomatoes Rating, display it
+  			if(data.Ratings !== undefined){
+  				console.log("Rotten Tomatoes Rating: "+ data.Ratings[1].Value);
+  			}
+  			console.log("Produced in: "+ data.Country);
+  			console.log("Language(s): "+ data.Language);
+  			console.log("Plot: "+ data.Plot);
+  			console.log("Actors: "+ data.Actors);
+  			
+  			//output same info to log.txt
+  			logInfo(data.Title+",");
+			logInfo(data.Year+",");
+			logInfo(data.imdbRating+",");
+			if(data.Ratings !== undefined){
+  				logInfo(data.Ratings[1].Value+",");
+  			}
+			logInfo(data.Country+",");
+			logInfo(data.Language+",");
+			logInfo(data.Plot+",");
+			logInfo(data.Actors+",");
+		}
+
+		else{
+			console.log('statusCode:', response && response.statusCode);
+			console.log("error:", error);
+		}
+	});
+
+};
+
+//this function uses the spotify api to retrieve information related to a song title
 function spotifySong(title){
 
-var spotify = new Spotify({
+	var spotify = new Spotify({
 		id: keys.spotifyKeys.client_ID,
 		secret: keys.spotifyKeys.client_secret,
 	});
@@ -102,36 +142,51 @@ var spotify = new Spotify({
 			console.log(response.tracks.items[0].external_urls.spotify);
 			//album
 			console.log(response.tracks.items[0].album.name);
+			//output same info to log.txt
+			logInfo(response.tracks.items[0].artists[0].name+",");
+			logInfo(response.tracks.items[0].name+",");
+			logInfo(response.tracks.items[0].external_urls.spotify+",");
+			logInfo(response.tracks.items[0].album.name+",");
 		})
 		.catch(function(err) {
 			console.log(error);
 		});
 };
 
-function movieThis(title){
-	
-	var omdbURL = "http://www.omdbapi.com/?apikey="+keys.omdbKeys.api_key+"&t="+title;
+//this function reads the random.txt file to execute the appropriate function.
+function doWhatItSays(){
 
-	request(omdbURL, function (error, response, body) {
-		 
-  		if(error ===null){
-  			var data = JSON.parse(body);
-  			
-  			console.log("--------------------");
-  			console.log("Title: " + data.Title);
-  			console.log("Released in: "+ data.Year);
-  			console.log("IMDB Rating: "+ data.imdbRating);
-  			console.log("Rotten Tomatoes Rating: "+ data.Ratings[1].Value);
-  			console.log("Produced in: "+ data.Country);
-  			console.log("Language(s): "+ data.Language);
-  			console.log("Plot: "+ data.Plot);
-  			console.log("Actors: "+ data.Actors);
-  		}
-		else{
-			console.log('statusCode:', response && response.statusCode);
-			console.log("error:", error);
-		}
+	var content = "";
+	file.readFile('./random.txt', 'utf8', function read(err, data) {
+	    if (err) {
+	        throw err;
+	    }
+	    content = data;
+	    //console.log(content);
+	    newCommand = content.split(",")[0];
+	    value = content.split(",")[1];
+	    
+	    //allow for changes to the random file with a different command
+	    if (newCommand ==="spotify-this-song"){
+	    	spotifySong(value);
+	    }
+	    else if (newCommand ==="movie-this"){
+	    	movieThis(value);
+	    }
+	    else if(newCommand ==="my-tweets"){
+	    	getTweets(value);
+	    }
 	});
-
 };
+function logInfo(data){
+	file.appendFile("log.txt", data, function(err) {
+	// If an error was experienced we say it.
+		if (err) {
+			console.log(err);
+		}
+
+	});
+};
+
+
 
