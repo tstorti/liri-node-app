@@ -62,7 +62,7 @@ function getTweets(username){
 		access_token_secret: keys.twitterKeys.access_token_secret,
 	});
 	 
-	var params = {screen_name: username};
+	var params = {screen_name: "tony storti"};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
 		if (!error) {
 	    	console.log("---------tony_storti tweets--------");
